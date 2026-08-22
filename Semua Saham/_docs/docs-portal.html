@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Notudo Finance — Project Docs</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #070b18;
+      --bg2: #0d1326;
+      --bg3: #111827;
+      --border: rgba(255,255,255,0.07);
+      --border-active: rgba(129,140,248,0.5);
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --subtle: #334155;
+      --purple: #818cf8;
+      --purple-dim: rgba(129,140,248,0.12);
+      --teal: #2dd4bf;
+      --amber: #fbbf24;
+      --rose: #fb7185;
+      --sky: #38bdf8;
+      --green: #4ade80;
+      --orange: #fb923c;
+    }
+
+    html, body { height: 100%; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* ── Sidebar ── */
+    #sidebar {
+      width: 240px;
+      min-width: 240px;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      position: relative;
+      z-index: 10;
+    }
+    .sidebar-logo {
+      padding: 24px 20px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sidebar-logo .brand {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--purple);
+      letter-spacing: -0.3px;
+    }
+    .sidebar-logo .sub {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .nav-section { padding: 16px 12px 4px; }
+    .nav-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 0 8px;
+      margin-bottom: 4px;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--muted);
+      transition: all 0.15s;
+      margin-bottom: 2px;
+    }
+    .nav-item:hover { background: var(--purple-dim); color: var(--text); }
+    .nav-item.active { background: var(--purple-dim); color: var(--purple); font-weight: 600; border: 1px solid rgba(129,140,248,0.2); }
+    .nav-icon { font-size: 15px; width: 20px; text-align: center; }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .version-badge {
+      display: inline-block;
+      background: rgba(129,140,248,0.1);
+      border: 1px solid rgba(129,140,248,0.2);
+      color: var(--purple);
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 20px;
+      margin-bottom: 6px;
+    }
+
+    /* ── Main ── */
+    #main {
+      flex: 1;
+      overflow-y: auto;
+      height: 100vh;
+    }
+    .page { display: none; padding: 40px 48px; max-width: 960px; animation: fadeIn 0.25s ease; }
+    .page.active { display: block; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+    /* ── Page header ── */
+    .page-header { margin-bottom: 36px; }
+    .page-header h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 6px; }
+    .page-header p { color: var(--muted); font-size: 14px; line-height: 1.6; max-width: 600px; }
+    .page-header .tags { display: flex; gap: 8px; margin-top: 12px; }
+    .pill {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+      letter-spacing: 0.2px;
+    }
+    .pill.purple { background: rgba(129,140,248,0.15); color: #a5b4fc; border: 1px solid rgba(129,140,248,0.2); }
+    .pill.teal   { background: rgba(45,212,191,0.12);  color: #5eead4; border: 1px solid rgba(45,212,191,0.2); }
+    .pill.amber  { background: rgba(251,191,36,0.12);  color: #fde68a; border: 1px solid rgba(251,191,36,0.2); }
+    .pill.green  { background: rgba(74,222,128,0.12);  color: #86efac; border: 1px solid rgba(74,222,128,0.2); }
+    .pill.rose   { background: rgba(251,113,133,0.12); color: #fda4af; border: 1px solid rgba(251,113,133,0.2); }
+    .pill.sky    { background: rgba(56,189,248,0.12);  color: #7dd3fc; border: 1px solid rgba(56,189,248,0.2); }
+
+    hr.divider { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 20px;
+      transition: border-color 0.2s;
+    }
+    .card:hover { border-color: rgba(129,140,248,0.2); }
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-body { font-size: 13px; color: #94a3b8; line-height: 1.7; }
+
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+    .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+
+    /* ── Stat cards ── */
+    .stat-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 22px;
+    }
+    .stat-card .stat-label { font-size: 11px; color: var(--muted); font-weight: 500; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-card .stat-val { font-size: 28px; font-weight: 800; letter-spacing: -1px; }
+    .stat-card .stat-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+    /* ── Flow (Overview) ── */
+    .flow-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      padding: 12px 0;
+    }
+    .flow-step {
+      width: 100%;
+      max-width: 640px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 22px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      transition: all 0.2s;
+      cursor: default;
+      position: relative;
+    }
+    .flow-step:hover { border-color: var(--border-active); box-shadow: 0 0 0 1px rgba(129,140,248,0.1), 0 8px 24px rgba(0,0,0,0.3); transform: translateX(4px); }
+    .flow-step .step-num {
+      width: 32px; height: 32px; min-width: 32px;
+      border-radius: 50%;
+      display: grid; place-items: center;
+      font-size: 13px; font-weight: 700;
+    }
+    .flow-step .step-body { flex: 1; }
+    .flow-step .step-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .flow-step .step-file { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+    .flow-step .step-desc { font-size: 12px; color: #94a3b8; line-height: 1.6; }
+    .flow-step .step-badge {
+      position: absolute;
+      right: 18px; top: 18px;
+      font-size: 10px; font-weight: 600;
+      padding: 3px 8px; border-radius: 20px;
+    }
+
+    .flow-arrow {
+      width: 2px;
+      height: 28px;
+      background: linear-gradient(to bottom, rgba(129,140,248,0.4), rgba(129,140,248,0.15));
+      margin: 0 auto;
+      position: relative;
+    }
+    .flow-arrow::after {
+      content: '';
+      position: absolute;
+      bottom: -5px; left: 50%;
+      transform: translateX(-50%);
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 7px solid rgba(129,140,248,0.4);
+    }
+
+    /* ── Ownership ── */
+    .owner-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      margin-bottom: 16px;
+      transition: border-color 0.2s;
+    }
+    .owner-card:hover { border-color: rgba(129,140,248,0.25); }
+    .avatar {
+      width: 52px; height: 52px; min-width: 52px;
+      border-radius: 14px;
+      font-size: 22px;
+      display: grid; place-items: center;
+      background: var(--bg3);
+    }
+    .owner-info { flex: 1; }
+    .owner-name { font-size: 16px; font-weight: 700; margin-bottom: 2px; }
+    .owner-role { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+    .owner-tasks { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+    .task-tag {
+      font-size: 11px; padding: 3px 10px; border-radius: 6px;
+      background: var(--bg3); color: #94a3b8; border: 1px solid var(--border);
+    }
+    .owner-note { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+    .contact-row { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+    .contact-chip {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 11px; color: var(--muted);
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      padding: 4px 10px; border-radius: 8px;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .contact-chip:hover { border-color: rgba(129,140,248,0.3); color: var(--purple); }
+
+    /* ── Runbook ── */
+    .runbook-step {
+      display: flex; gap: 20px;
+      margin-bottom: 28px;
+    }
+    .runbook-step .step-indicator {
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .run-num {
+      width: 36px; height: 36px; min-width: 36px;
+      border-radius: 10px;
+      background: var(--purple-dim);
+      border: 1px solid rgba(129,140,248,0.25);
+      display: grid; place-items: center;
+      font-size: 13px; font-weight: 700; color: var(--purple);
+    }
+    .run-line {
+      width: 2px; flex: 1; margin-top: 8px;
+      background: var(--border);
+      min-height: 20px;
+    }
+    .runbook-step .run-body { flex: 1; padding-top: 4px; }
+    .run-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+    .run-file { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+    .run-list { list-style: none; }
+    .run-list li {
+      font-size: 13px; color: #94a3b8;
+      padding: 5px 0 5px 20px;
+      position: relative; line-height: 1.6;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+    .run-list li::before { content: '›'; position: absolute; left: 4px; color: var(--muted); }
+    .code-block {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #7dd3fc;
+      margin-top: 10px;
+      overflow-x: auto;
+    }
+    .warn-box {
+      background: rgba(251,191,36,0.05);
+      border: 1px solid rgba(251,191,36,0.2);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 12px;
+      color: #fde68a;
+      margin-top: 10px;
+      line-height: 1.6;
+    }
+    .info-box {
+      background: rgba(56,189,248,0.05);
+      border: 1px solid rgba(56,189,248,0.2);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 12px;
+      color: #7dd3fc;
+      margin-top: 10px;
+      line-height: 1.6;
+    }
+
+    /* ── Changelog ── */
+    .change-item {
+      border-left: 2px solid var(--border);
+      padding: 0 0 28px 24px;
+      margin-left: 12px;
+      position: relative;
+    }
+    .change-item::before {
+      content: '';
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: var(--bg2);
+      border: 2px solid var(--border);
+      position: absolute;
+      left: -7px; top: 2px;
+      transition: border-color 0.2s;
+    }
+    .change-item:hover::before { border-color: var(--purple); }
+    .change-item:last-child { border-left: 2px solid transparent; }
+    .change-date {
+      font-size: 11px; color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: 6px;
+    }
+    .change-version {
+      display: inline-block;
+      font-size: 12px; font-weight: 700;
+      padding: 2px 10px; border-radius: 20px;
+      margin-bottom: 8px;
+    }
+    .change-title { font-size: 15px; font-weight: 600; margin-bottom: 10px; }
+    .change-notes { list-style: none; }
+    .change-notes li {
+      font-size: 13px; color: #94a3b8;
+      padding: 4px 0 4px 18px;
+      position: relative; line-height: 1.6;
+    }
+    .change-notes li::before {
+      content: attr(data-type);
+      position: absolute; left: 0;
+      font-size: 11px;
+    }
+    li[data-type="✨"]::before { content: '✨'; }
+    li[data-type="🐛"]::before { content: '🐛'; }
+    li[data-type="⚡"]::before { content: '⚡'; }
+    li[data-type="📝"]::before { content: '📝'; }
+    li[data-type="🔧"]::before { content: '🔧'; }
+
+    .add-change-btn {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 16px; border-radius: 10px;
+      background: var(--purple-dim);
+      border: 1px dashed rgba(129,140,248,0.3);
+      color: var(--purple); font-size: 13px; font-weight: 500;
+      cursor: pointer; transition: all 0.15s; margin-top: 8px;
+    }
+    .add-change-btn:hover { background: rgba(129,140,248,0.2); border-style: solid; }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: none; place-items: center;
+    }
+    .modal-overlay.show { display: grid; }
+    .modal {
+      background: var(--bg2);
+      border: 1px solid rgba(129,140,248,0.25);
+      border-radius: 18px;
+      padding: 32px;
+      width: 480px;
+      max-width: 90vw;
+      animation: popIn 0.2s ease;
+    }
+    @keyframes popIn { from { transform: scale(0.95); opacity:0; } to { transform: scale(1); opacity:1; } }
+    .modal h3 { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 6px; }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .form-group textarea { min-height: 80px; resize: vertical; }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus { border-color: rgba(129,140,248,0.5); }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+    .btn {
+      padding: 9px 20px; border-radius: 9px;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      transition: all 0.15s; border: none;
+    }
+    .btn-primary { background: var(--purple); color: #1e1b4b; }
+    .btn-primary:hover { background: #a5b4fc; }
+    .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+    .btn-ghost:hover { background: var(--bg3); color: var(--text); }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--subtle); border-radius: 99px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: var(--bg2); border: 1px solid rgba(129,140,248,0.3);
+      color: var(--purple); font-size: 13px; font-weight: 500;
+      padding: 10px 20px; border-radius: 99px;
+      opacity: 0; transition: opacity 0.3s;
+      pointer-events: none; z-index: 2000;
+      white-space: nowrap;
+    }
+    #toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+
+<!-- ── SIDEBAR ── -->
+<nav id="sidebar">
+  <div class="sidebar-logo">
+    <div class="brand">🇮🇩 Notudo Finance</div>
+    <div class="sub">BEI Data Pipeline Docs</div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Documentation</div>
+    <div class="nav-item active" data-page="overview">
+      <span class="nav-icon">🗺️</span> Overview & Flow
+    </div>
+    <div class="nav-item" data-page="runbook">
+      <span class="nav-icon">📖</span> Runbook / SOP
+    </div>
+    <div class="nav-item" data-page="ownership">
+      <span class="nav-icon">👤</span> Ownership
+    </div>
+    <div class="nav-item" data-page="changelog">
+      <span class="nav-icon">📋</span> Changelog
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="version-badge">v1.2.0</div>
+    <div>Last updated: Aug 2026</div>
+    <div style="margin-top:4px">Solo Project · Scalable</div>
+  </div>
+</nav>
+
+<!-- ── MAIN CONTENT ── -->
+<main id="main">
+
+  <!-- ══════════ OVERVIEW ══════════ -->
+  <div class="page active" id="page-overview">
+    <div class="page-header">
+      <h1>🗺️ Overview & Pipeline Flow</h1>
+      <p>Gambaran besar project scraping data saham BEI. Pipeline ini mengumpulkan data harga historis + aktivitas broker dari 775+ emiten di Bursa Efek Indonesia.</p>
+      <div class="tags">
+        <span class="pill purple">Python</span>
+        <span class="pill teal">Selenium</span>
+        <span class="pill amber">Stockbit</span>
+        <span class="pill sky">Pandas</span>
+        <span class="pill green">BEI</span>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid3">
+      <div class="stat-card">
+        <div class="stat-label">Total Emiten</div>
+        <div class="stat-val" style="color:var(--purple)">775</div>
+        <div class="stat-sub">File CSV di Dataset/</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Emiten Scraped</div>
+        <div class="stat-val" style="color:var(--teal)">826</div>
+        <div class="stat-sub">Di Perusahaan.csv</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Sektor BEI</div>
+        <div class="stat-val" style="color:var(--amber)">10</div>
+        <div class="stat-sub">Barang Baku, Keuangan, dst.</div>
+      </div>
+    </div>
+
+    <hr class="divider"/>
+    <h2 style="font-size:16px;font-weight:700;margin-bottom:20px;color:var(--text)">Alur Pipeline Step-by-Step</h2>
+
+    <div class="flow-container">
+
+      <div class="flow-step">
+        <div class="step-num" style="background:rgba(129,140,248,0.15);color:var(--purple)">1</div>
+        <div class="step-body">
+          <div class="step-title">🔐 Login Stockbit</div>
+          <div class="step-file">login.ipynb</div>
+          <div class="step-desc">Inisialisasi Edge WebDriver dengan profil browser khusus Stockbit. Login manual satu kali — sesi tersimpan di profil, tidak perlu login ulang tiap run.</div>
+        </div>
+        <span class="step-badge" style="background:rgba(129,140,248,0.1);color:var(--purple)">Setup</span>
+      </div>
+      <div class="flow-arrow"></div>
+
+      <div class="flow-step">
+        <div class="step-num" style="background:rgba(45,212,191,0.12);color:var(--teal)">2</div>
+        <div class="step-body">
+          <div class="step-title">📋 Scraping Daftar Emiten</div>
+          <div class="step-file">scrap-list-perusahaan.ipynb</div>
+          <div class="step-desc">Loop 10 sektor × sub-sektor di Stockbit. Virtual scroll trick via scrollIntoView. Output 826 emiten ke <code style="font-family:monospace;font-size:11px;background:var(--bg);padding:1px 5px;border-radius:4px">List-Perusahaan/Perusahaan.csv</code></div>
+        </div>
+        <span class="step-badge" style="background:rgba(45,212,191,0.1);color:var(--teal)">~10 menit</span>
+      </div>
+      <div class="flow-arrow"></div>
+
+      <div class="flow-step">
+        <div class="step-num" style="background:rgba(251,191,36,0.12);color:var(--amber)">3</div>
+        <div class="step-body">
+          <div class="step-title">💹 Scraping Harga Saham</div>
+          <div class="step-file">scrap-all-harga.ipynb</div>
+          <div class="step-desc">Download data OHLCV historis tiap emiten. Simpan per-ticker ke <code style="font-family:monospace;font-size:11px;background:var(--bg);padding:1px 5px;border-radius:4px">Dataset/[KODE].JK.csv</code></div>
+        </div>
+        <span class="step-badge" style="background:rgba(251,191,36,0.1);color:var(--amber)">~30–60 mnt</span>
+      </div>
+      <div class="flow-arrow"></div>
+
+      <div class="flow-step">
+        <div class="step-num" style="background:rgba(251,113,133,0.12);color:var(--rose)">4</div>
+        <div class="step-body">
+          <div class="step-title">📊 Scraping Broker Summary</div>
+          <div class="step-file">scrap-broker-summary.ipynb</div>
+          <div class="step-desc">Loop 775 ticker di Stockbit. Navigasi mundur per hari. Proteksi koneksi + validasi broker. Append kolom ke CSV yang sudah ada.</div>
+        </div>
+        <span class="step-badge" style="background:rgba(251,113,133,0.1);color:var(--rose)">4–8 jam</span>
+      </div>
+      <div class="flow-arrow"></div>
+
+      <div class="flow-step">
+        <div class="step-num" style="background:rgba(56,189,248,0.12);color:var(--sky)">5</div>
+        <div class="step-body">
+          <div class="step-title">🔄 Update & Migrasi CSV</div>
+          <div class="step-file">update_existing_csvs.py</div>
+          <div class="step-desc">Tambah kolom Sektor & Sub_Sektor ke semua CSV dari mapping Perusahaan.csv. Sisipkan setelah kolom Volume. Skip file yang sudah punya kolom.</div>
+        </div>
+        <span class="step-badge" style="background:rgba(56,189,248,0.1);color:var(--sky)">~1 menit</span>
+      </div>
+      <div class="flow-arrow"></div>
+
+      <div class="flow-step">
+        <div class="step-num" style="background:rgba(74,222,128,0.12);color:var(--green)">6</div>
+        <div class="step-body">
+          <div class="step-title">🧪 Verifikasi Data</div>
+          <div class="step-file">test-read.ipynb</div>
+          <div class="step-desc">Baca & validasi hasil CSV. Cek kelengkapan kolom, struktur data, dan konsistensi output.</div>
+        </div>
+        <span class="step-badge" style="background:rgba(74,222,128,0.1);color:var(--green)">Manual</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════ RUNBOOK ══════════ -->
+  <div class="page" id="page-runbook">
+    <div class="page-header">
+      <h1>📖 Runbook / SOP</h1>
+      <p>Standard Operating Procedure untuk menjalankan pipeline dari awal sampai selesai. Ikuti urutan ini setiap kali ingin scraping ulang atau update data.</p>
+    </div>
+
+    <div class="warn-box">⚠️ <strong>Prasyarat:</strong> Pastikan <code>msedgedriver.exe</code> di folder <code>Driver/</code> versinya cocok dengan Microsoft Edge yang terinstall. Cek versi Edge di <code>edge://settings/help</code></div>
+
+    <hr class="divider"/>
+
+    <!-- Step 0: Install -->
+    <div class="runbook-step">
+      <div class="step-indicator">
+        <div class="run-num">0</div>
+        <div class="run-line"></div>
+      </div>
+      <div class="run-body">
+        <div class="run-title">⚙️ Instalasi (Satu kali)</div>
+        <div class="run-file">requirements.txt</div>
+        <ul class="run-list">
+          <li>Install Python dependencies yang dibutuhkan</li>
+          <li>Buat profil Edge khusus di path yang dikonfigurasi</li>
+        </ul>
+        <div class="code-block">pip install selenium pandas keyboard</div>
+        <div class="info-box">💡 <strong>Edge Profile:</strong> Profil Edge tersimpan di <code>D:\Tools\selenium_edge_profile\Stockbit</code>. Ubah path ini di tiap notebook jika beda komputer.</div>
+      </div>
+    </div>
+
+    <!-- Step 1 -->
+    <div class="runbook-step">
+      <div class="step-indicator">
+        <div class="run-num">1</div>
+        <div class="run-line"></div>
+      </div>
+      <div class="run-body">
+        <div class="run-title">🔐 Login Stockbit</div>
+        <div class="run-file">login.ipynb</div>
+        <ul class="run-list">
+          <li>Jalankan semua cell di <code>login.ipynb</code></li>
+          <li>Browser Edge akan terbuka dan navigasi ke Stockbit</li>
+          <li>Login secara manual di browser (Google Login)</li>
+          <li>Setelah login berhasil, tekan tombol <strong>Q</strong> di keyboard untuk menutup browser</li>
+          <li>Sesi tersimpan — tidak perlu login ulang selanjutnya</li>
+        </ul>
+        <div class="warn-box">⚠️ Jangan tutup browser manual lewat tombol X — gunakan tombol <strong>Q</strong> agar sesi tersimpan dengan benar.</div>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="runbook-step">
+      <div class="step-indicator">
+        <div class="run-num">2</div>
+        <div class="run-line"></div>
+      </div>
+      <div class="run-body">
+        <div class="run-title">📋 Scraping Daftar Emiten</div>
+        <div class="run-file">scrap-list-perusahaan.ipynb</div>
+        <ul class="run-list">
+          <li>Jalankan semua cell di notebook ini</li>
+          <li>Script akan auto-login menggunakan sesi yang tersimpan</li>
+          <li>Loop 10 sektor × sub-sektor secara otomatis</li>
+          <li>Output tersimpan ke <code>List-Perusahaan/Perusahaan.csv</code></li>
+          <li>Cek output: harus ada ~826 baris</li>
+        </ul>
+        <div class="info-box">💡 Jika ada sektor yang gagal (error), script akan skip dan lanjut ke sektor berikutnya. Cek log output untuk detail.</div>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="runbook-step">
+      <div class="step-indicator">
+        <div class="run-num">3</div>
+        <div class="run-line"></div>
+      </div>
+      <div class="run-body">
+        <div class="run-title">💹 Scraping Harga Saham</div>
+        <div class="run-file">scrap-all-harga.ipynb</div>
+        <ul class="run-list">
+          <li>Jalankan semua cell di notebook ini</li>
+          <li>Script membaca daftar ticker dari <code>Perusahaan.csv</code></li>
+          <li>Download data OHLCV untuk tiap emiten</li>
+          <li>Hasil disimpan ke <code>Dataset/[KODE].JK.csv</code></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="runbook-step">
+      <div class="step-indicator">
+        <div class="run-num">4</div>
+        <div class="run-line"></div>
+      </div>
+      <div class="run-body">
+        <div class="run-title">📊 Scraping Broker Summary</div>
+        <div class="run-file">scrap-broker-summary.ipynb</div>
+        <ul class="run-list">
+          <li>Pastikan koneksi internet stabil (proses panjang 4–8 jam)</li>
+          <li>Jalankan semua cell — bisa ditinggal berjalan</li>
+          <li>Script auto-pause jika internet putus, lanjut ketika pulih</li>
+          <li>Skip ticker yang datanya sudah lengkap (incremental)</li>
+          <li>Data broker di-append ke CSV yang sudah ada</li>
+        </ul>
+        <div class="warn-box">⚠️ <strong>Jangan matikan komputer</strong> saat script berjalan. Jika terpaksa berhenti, jalankan ulang — script akan melanjutkan dari ticker yang belum selesai.</div>
+      </div>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="runbook-step">
+      <div class="step-indicator">
+        <div class="run-num">5</div>
+        <div class="run-line"></div>
+      </div>
+      <div class="run-body">
+        <div class="run-title">🔄 Update & Migrasi CSV</div>
+        <div class="run-file">update_existing_csvs.py</div>
+        <ul class="run-list">
+          <li>Jalankan script via terminal / command prompt</li>
+          <li>Menambahkan kolom Sektor & Sub_Sektor ke semua CSV</li>
+          <li>File yang sudah punya kolom tersebut akan di-skip otomatis</li>
+        </ul>
+        <div class="code-block">python update_existing_csvs.py</div>
+      </div>
+    </div>
+
+    <!-- Step 6 -->
+    <div class="runbook-step">
+      <div class="step-indicator">
+        <div class="run-num">6</div>
+      </div>
+      <div class="run-body">
+        <div class="run-title">🧪 Verifikasi Data</div>
+        <div class="run-file">test-read.ipynb</div>
+        <ul class="run-list">
+          <li>Buka <code>test-read.ipynb</code> dan jalankan cell verifikasi</li>
+          <li>Cek jumlah file CSV di Dataset/ (harus 775)</li>
+          <li>Cek kolom yang ada di beberapa sample CSV</li>
+          <li>Validasi tidak ada data kosong di kolom kritis</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══════════ OWNERSHIP ══════════ -->
+  <div class="page" id="page-ownership">
+    <div class="page-header">
+      <h1>👤 Ownership & Responsibilities</h1>
+      <p>Siapa yang bertanggung jawab atas apa. Scalable untuk tim yang berkembang.</p>
+    </div>
+
+    <div class="owner-card">
+      <div class="avatar" style="background:rgba(129,140,248,0.15)">👨‍💻</div>
+      <div class="owner-info">
+        <div class="owner-name">Affan Shdr <span style="font-size:12px;color:var(--purple);margin-left:8px">● Owner</span></div>
+        <div class="owner-role">Lead Developer · Data Engineer</div>
+        <div class="owner-tasks">
+          <span class="task-tag">Pipeline Architecture</span>
+          <span class="task-tag">Scraping Logic</span>
+          <span class="task-tag">Data Validation</span>
+          <span class="task-tag">Runbook</span>
+        </div>
+        <div class="owner-note">Handle semua aspek teknis pipeline — dari setup Selenium, logic scraping, sampai validasi output. Satu-satunya contributor aktif saat ini.</div>
+        <div class="contact-row">
+          <div class="contact-chip" onclick="toast('GitHub: affanshdr')">🐙 affanshdr</div>
+          <div class="contact-chip" onclick="toast('Tambah kontak di sini')">📧 Edit email</div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider"/>
+    <h2 style="font-size:15px;font-weight:700;margin-bottom:16px">Responsibility Matrix</h2>
+
+    <div class="card">
+      <div class="card-title">🔐 Pipeline & Infrastructure</div>
+      <div class="card-body">
+        Seluruh kode pipeline, setup WebDriver, konfigurasi Edge profile, dan deployment.
+        <div style="margin-top:10px;display:flex;gap:8px"><span class="pill purple">Affan Shdr</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📊 Data Quality & Validation</div>
+      <div class="card-body">
+        Cek kelengkapan data, validasi format CSV, verifikasi kolom broker, dan monitoring output.
+        <div style="margin-top:10px;display:flex;gap:8px"><span class="pill purple">Affan Shdr</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📖 Documentation</div>
+      <div class="card-body">
+        Pembaruan runbook, changelog, dan dokumentasi teknis setiap ada perubahan pipeline.
+        <div style="margin-top:10px;display:flex;gap:8px"><span class="pill purple">Affan Shdr</span></div>
+      </div>
+    </div>
+
+    <hr class="divider"/>
+    <div style="background:rgba(129,140,248,0.06);border:1px dashed rgba(129,140,248,0.2);border-radius:12px;padding:20px;">
+      <div style="font-size:14px;font-weight:600;margin-bottom:6px">🚀 Slot Terbuka untuk Tim</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.7">Project ini didesain scalable. Saat tim berkembang, ownership bisa dibagi ke:<br>
+      <strong style="color:var(--text)">Data Analyst</strong> — analisis output · <strong style="color:var(--text)">Backend Dev</strong> — API dari data · <strong style="color:var(--text)">DevOps</strong> — scheduling & monitoring</div>
+    </div>
+  </div>
+
+  <!-- ══════════ CHANGELOG ══════════ -->
+  <div class="page" id="page-changelog">
+    <div class="page-header">
+      <h1>📋 Changelog</h1>
+      <p>Log semua perubahan, perbaikan bug, dan penambahan fitur pada pipeline.</p>
+    </div>
+
+    <button class="add-change-btn" onclick="openModal()">
+      <span>＋</span> Tambah Entry Baru
+    </button>
+
+    <hr class="divider"/>
+    <div id="changelog-list">
+
+      <div class="change-item">
+        <div class="change-date">22 Agustus 2026</div>
+        <span class="change-version" style="background:rgba(129,140,248,0.15);color:var(--purple)">v1.2.0</span>
+        <div class="change-title">Dokumentasi & Project Docs Portal</div>
+        <ul class="change-notes">
+          <li data-type="✨">Buat <code>docs-portal.html</code> — portal dokumentasi interaktif (Overview, Runbook, Ownership, Changelog)</li>
+          <li data-type="📝">Tambah README.md dengan flow pipeline lengkap</li>
+          <li data-type="📝">Dokumentasi struktur output CSV dan kolom-kolomnya</li>
+        </ul>
+      </div>
+
+      <div class="change-item">
+        <div class="change-date">Juli 2026</div>
+        <span class="change-version" style="background:rgba(45,212,191,0.12);color:var(--teal)">v1.1.0</span>
+        <div class="change-title">Broker Scraper — Proteksi & Validasi</div>
+        <ul class="change-notes">
+          <li data-type="✨">Tambah proteksi koneksi internet: auto-pause jika Stockbit tidak bisa diakses</li>
+          <li data-type="✨">Validasi kode broker 2 huruf kapital — data ngasal otomatis dibuang</li>
+          <li data-type="⚡">Navigasi tanggal mundur pakai dynamic wait — lebih reliable dari sleep flat</li>
+          <li data-type="🐛">Fix: tabel broker salah scope ke widget Running Trade — sekarang di-scope ke <code>broker_section</code></li>
+          <li data-type="🔧">Proteksi overwrite: baris yang sudah valid tidak akan ditimpa</li>
+        </ul>
+      </div>
+
+      <div class="change-item">
+        <div class="change-date">Juni 2026</div>
+        <span class="change-version" style="background:rgba(251,191,36,0.12);color:var(--amber)">v1.0.1</span>
+        <div class="change-title">Migrasi Kolom Sektor ke Dataset</div>
+        <ul class="change-notes">
+          <li data-type="✨">Buat <code>update_existing_csvs.py</code> untuk migrasi massal kolom Sektor & Sub_Sektor</li>
+          <li data-type="🔧">Kolom disisipkan setelah kolom Volume agar urutan rapi</li>
+          <li data-type="⚡">Skip file yang sudah punya kolom (idempotent)</li>
+        </ul>
+      </div>
+
+      <div class="change-item">
+        <div class="change-date">Mei 2026</div>
+        <span class="change-version" style="background:rgba(74,222,128,0.12);color:var(--green)">v1.0.0</span>
+        <div class="change-title">Initial Release — Pipeline Dasar</div>
+        <ul class="change-notes">
+          <li data-type="✨">Scraping daftar emiten BEI dari Stockbit per sektor/sub-sektor</li>
+          <li data-type="✨">Virtual scroll trick via scrollIntoView untuk tabel panjang</li>
+          <li data-type="✨">Scraping harga historis OHLCV per emiten</li>
+          <li data-type="✨">Setup Edge WebDriver dengan profil khusus Stockbit</li>
+          <li data-type="📝">825 emiten berhasil di-scrape dari 10 sektor</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<!-- ── ADD CHANGELOG MODAL ── -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3>📋 Tambah Changelog Entry</h3>
+    <div class="form-group">
+      <label>Tanggal</label>
+      <input type="text" id="cl-date" placeholder="contoh: 22 Agustus 2026"/>
+    </div>
+    <div class="form-group">
+      <label>Versi</label>
+      <input type="text" id="cl-version" placeholder="contoh: v1.3.0"/>
+    </div>
+    <div class="form-group">
+      <label>Judul Perubahan</label>
+      <input type="text" id="cl-title" placeholder="contoh: Perbaikan koneksi broker"/>
+    </div>
+    <div class="form-group">
+      <label>Catatan (satu per baris, awali dengan ✨ 🐛 ⚡ 📝 🔧)</label>
+      <textarea id="cl-notes" placeholder="✨ Fitur baru: ...&#10;🐛 Fix bug: ...&#10;⚡ Optimasi: ..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Batal</button>
+      <button class="btn btn-primary" onclick="addChangelog()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ── Navigation ── */
+const navItems = document.querySelectorAll('.nav-item');
+const pages    = document.querySelectorAll('.page');
+
+navItems.forEach(item => {
+  item.addEventListener('click', () => {
+    navItems.forEach(n => n.classList.remove('active'));
+    pages.forEach(p => p.classList.remove('active'));
+    item.classList.add('active');
+    document.getElementById('page-' + item.dataset.page).classList.add('active');
+  });
+});
+
+/* ── Modal ── */
+function openModal() {
+  const d = new Date();
+  document.getElementById('cl-date').value =
+    d.getDate() + ' ' + ['Januari','Februari','Maret','April','Mei','Juni',
+    'Juli','Agustus','September','Oktober','November','Desember'][d.getMonth()] + ' ' + d.getFullYear();
+  document.getElementById('modal').classList.add('show');
+}
+function closeModal() {
+  document.getElementById('modal').classList.remove('show');
+}
+document.getElementById('modal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeModal();
+});
+
+function addChangelog() {
+  const date    = document.getElementById('cl-date').value.trim();
+  const version = document.getElementById('cl-version').value.trim();
+  const title   = document.getElementById('cl-title').value.trim();
+  const notes   = document.getElementById('cl-notes').value.trim();
+
+  if (!date || !title) { toast('Isi tanggal dan judul dulu ya!'); return; }
+
+  const notesHtml = notes.split('\n').filter(l => l.trim()).map(line => {
+    const icon = line.match(/^(✨|🐛|⚡|📝|🔧)/)?.[1] || '📝';
+    const text = line.replace(/^(✨|🐛|⚡|📝|🔧)\s*/, '');
+    return `<li data-type="${icon}">${text}</li>`;
+  }).join('');
+
+  const colorMap = {
+    'v1': 'rgba(129,140,248,0.15);color:var(--purple)',
+    'v2': 'rgba(45,212,191,0.12);color:var(--teal)',
+  };
+
+  const html = `
+    <div class="change-item" style="animation:fadeIn 0.3s ease">
+      <div class="change-date">${date}</div>
+      <span class="change-version" style="background:rgba(251,191,36,0.12);color:var(--amber)">${version || 'Update'}</span>
+      <div class="change-title">${title}</div>
+      <ul class="change-notes">${notesHtml}</ul>
+    </div>`;
+
+  const list = document.getElementById('changelog-list');
+  list.insertAdjacentHTML('afterbegin', html);
+  closeModal();
+  toast('✅ Changelog berhasil ditambahkan!');
+
+  // reset
+  ['cl-date','cl-version','cl-title','cl-notes'].forEach(id => document.getElementById(id).value = '');
+}
+
+/* ── Toast ── */
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>

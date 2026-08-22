@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Notudo Finance — Interactive Flow Studio & Pipeline Builder</title>
+  <meta name="description" content="Visual Drag and Drop Workflow Studio & Pipeline Manager for BEI Stock Scraper project" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ── Top Header / App Bar ── -->
+  <header id="app-header">
+    <div class="header-left">
+      <div class="brand">
+        <span class="brand-icon">🇮🇩</span>
+        <span class="brand-text">Notudo Finance</span>
+        <span class="brand-badge">Flow Studio</span>
+      </div>
+      <div class="header-divider"></div>
+      <div class="flow-title-container">
+        <span class="flow-title" id="flow-title-text">BEI Stock Scraper Pipeline</span>
+        <span class="flow-status" id="simulation-status-badge">Idle</span>
+      </div>
+    </div>
+
+    <div class="header-center">
+      <!-- Simulation Controls -->
+      <div class="sim-controls">
+        <button id="btn-run-sim" class="btn btn-emerald" title="Jalankan Simulasi Eksekusi Pipeline">
+          <span class="icon">▶</span>
+          <span>Run Simulation</span>
+        </button>
+        <button id="btn-pause-sim" class="btn btn-ghost" title="Pause Simulasi" disabled>
+          <span class="icon">⏸</span>
+        </button>
+
+        <div class="speed-selector">
+          <label>Speed:</label>
+          <select id="sim-speed">
+            <option value="1">1x</option>
+            <option value="2" selected>2x</option>
+            <option value="4">4x</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <button id="btn-add-custom-node" class="btn btn-purple">
+        <span class="icon">+</span> Node
+      </button>
+      <button id="btn-reset-preset" class="btn btn-ghost" title="Reset ke Diagram Pipeline Notudo Default">
+        <span class="icon">🔄</span> Reset
+      </button>
+      <div class="header-divider"></div>
+      <button id="btn-import-json" class="btn btn-ghost" title="Import JSON Workflow">
+        <span class="icon">📥</span> Import
+      </button>
+      <button id="btn-export-json" class="btn btn-ghost" title="Export JSON Workflow">
+        <span class="icon">📤</span> Export
+      </button>
+      <button id="btn-open-runbook" class="btn btn-gradient" title="Buka Dokumentasi & SOP Pipeline">
+        <span class="icon">📖</span> Runbook SOP
+      </button>
+      <input type="file" id="file-import-input" accept=".json" style="display: none;" />
+    </div>
+  </header>
+
+  <!-- ── Main App Layout ── -->
+  <div id="app-body">
+
+    <!-- ── Left Sidebar (Palette) ── -->
+    <aside id="sidebar-palette">
+      <div class="sidebar-header">
+        <h2>Node Library</h2>
+        <p>Drag block ke canvas untuk menambahkan node alur</p>
+      </div>
+
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="palette-search" placeholder="Cari block atau step..." />
+      </div>
+
+      <div class="palette-sections">
+
+        <!-- Notudo Pipeline Presets -->
+        <div class="palette-category">
+          <div class="category-header">
+            <span class="cat-icon">⚡</span>
+            <span class="cat-title">Notudo Pipeline Steps</span>
+          </div>
+
+          <div class="palette-list" id="preset-palette-list">
+            <div class="palette-item purple" draggable="true" data-type="login">
+              <div class="item-icon">🔐</div>
+              <div class="item-info">
+                <div class="item-name">Step 1 · Login Stockbit</div>
+                <div class="item-sub">login.ipynb</div>
+              </div>
+            </div>
+
+            <div class="palette-item teal" draggable="true" data-type="listco">
+              <div class="item-icon">📋</div>
+              <div class="item-info">
+                <div class="item-name">Step 2 · Scraping Emiten</div>
+                <div class="item-sub">scrap-list-perusahaan.ipynb</div>
+              </div>
+            </div>
+
+            <div class="palette-item amber" draggable="true" data-type="harga">
+              <div class="item-icon">💹</div>
+              <div class="item-info">
+                <div class="item-name">Step 3 · Scraping Harga</div>
+                <div class="item-sub">scrap-all-harga.ipynb</div>
+              </div>
+            </div>
+
+            <div class="palette-item rose" draggable="true" data-type="broker">
+              <div class="item-icon">📊</div>
+              <div class="item-info">
+                <div class="item-name">Step 4 · Scraping Broker</div>
+                <div class="item-sub">scrap-broker-summary.ipynb</div>
+              </div>
+            </div>
+
+            <div class="palette-item sky" draggable="true" data-type="update">
+              <div class="item-icon">🔄</div>
+              <div class="item-info">
+                <div class="item-name">Step 5 · Update CSVs</div>
+                <div class="item-sub">update_existing_csvs.py</div>
+              </div>
+            </div>
+
+            <div class="palette-item green" draggable="true" data-type="verifikasi">
+              <div class="item-icon">🧪</div>
+              <div class="item-info">
+                <div class="item-name">Step 6 · Verifikasi Data</div>
+                <div class="item-sub">test-read.ipynb</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Custom / Generic Flow Blocks -->
+        <div class="palette-category">
+          <div class="category-header">
+            <span class="cat-icon">🧱</span>
+            <span class="cat-title">Generic Workflow Blocks</span>
+          </div>
+
+          <div class="palette-list" id="generic-palette-list">
+            <div class="palette-item indigo" draggable="true" data-type="trigger">
+              <div class="item-icon">🚀</div>
+              <div class="item-info">
+                <div class="item-name">Trigger / Event</div>
+                <div class="item-sub">Scheduler & Webhooks</div>
+              </div>
+            </div>
+
+            <div class="palette-item cyan" draggable="true" data-type="script">
+              <div class="item-icon">🐍</div>
+              <div class="item-info">
+                <div class="item-name">Python Script</div>
+                <div class="item-sub">Custom Code Process</div>
+              </div>
+            </div>
+
+            <div class="palette-item amber" draggable="true" data-type="datastore">
+              <div class="item-icon">🗄️</div>
+              <div class="item-info">
+                <div class="item-name">CSV / Datastore</div>
+                <div class="item-sub">Storage & Input Data</div>
+              </div>
+            </div>
+
+            <div class="palette-item rose" draggable="true" data-type="condition">
+              <div class="item-icon">🔀</div>
+              <div class="item-info">
+                <div class="item-name">Condition / Filter</div>
+                <div class="item-sub">If/Else Branching</div>
+              </div>
+            </div>
+
+            <div class="palette-item emerald" draggable="true" data-type="output">
+              <div class="item-icon">🎯</div>
+              <div class="item-info">
+                <div class="item-name">Output / Export</div>
+                <div class="item-sub">Result Handler</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="stats-counter">
+          <span>Nodes: <strong id="count-nodes">0</strong></span>
+          <span>Links: <strong id="count-links">0</strong></span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ── Center Canvas Area ── -->
+    <main id="canvas-container">
+      <div id="canvas-grid"></div>
+
+      <!-- World Transform Layer -->
+      <div id="canvas-world">
+        <!-- SVG Connections Layer -->
+        <svg id="svg-connections" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="marker-arrow" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+              <path d="M 0 0 L 10 4 L 0 8 z" fill="rgba(129, 140, 248, 0.8)"/>
+            </marker>
+            <marker id="marker-arrow-active" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+              <path d="M 0 0 L 10 4 L 0 8 z" fill="#38bdf8"/>
+            </marker>
+
+            <!-- Glow Filters -->
+            <filter id="wire-glow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="3" result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
+          </defs>
+
+          <g id="wires-group"></g>
+          <path id="drag-wire" d="" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="6,4" style="display:none;" />
+        </svg>
+
+        <!-- Nodes Container -->
+        <div id="nodes-container"></div>
+      </div>
+
+      <!-- Canvas Controls Floating Overlay -->
+      <div id="canvas-controls">
+        <button class="ctrl-btn" id="btn-zoom-in" title="Zoom In">+</button>
+        <button class="ctrl-btn" id="btn-zoom-out" title="Zoom Out">−</button>
+        <button class="ctrl-btn" id="btn-zoom-fit" title="Fit & Center View">⊡</button>
+        <div class="zoom-indicator" id="zoom-level">75%</div>
+      </div>
+
+      <!-- Canvas Tip Banner -->
+      <div id="canvas-tip">
+        <span>💡 Drag block dari sidebar · Tarik port bundar untuk menghubungkan node · Scroll untuk zoom · Geser background untuk pan</span>
+      </div>
+    </main>
+
+    <!-- ── Right Sidebar (Inspector) ── -->
+    <aside id="sidebar-inspector" class="collapsed">
+      <div class="inspector-header">
+        <h3>Node Properties</h3>
+        <button class="btn-icon" id="btn-close-inspector">✕</button>
+      </div>
+
+      <div class="inspector-body" id="inspector-content">
+        <div class="empty-state">
+          <span class="empty-icon">🖱️</span>
+          <p>Pilih node di canvas untuk melihat & mengedit properti</p>
+        </div>
+
+        <form id="inspector-form" style="display: none;">
+          <div class="form-group">
+            <label for="inp-node-title">Judul Node</label>
+            <input type="text" id="inp-node-title" required />
+          </div>
+
+          <div class="form-group">
+            <label for="inp-node-file">File / Script Path</label>
+            <input type="text" id="inp-node-file" placeholder="misal: login.ipynb" />
+          </div>
+
+          <div class="form-group">
+            <label for="inp-node-theme">Tema Warna / Kategori</label>
+            <select id="inp-node-theme">
+              <option value="purple">Purple (Setup / Login)</option>
+              <option value="teal">Teal (List Scraping)</option>
+              <option value="amber">Amber (Data / Storage)</option>
+              <option value="rose">Rose (Complex Scraper)</option>
+              <option value="sky">Sky (Migration & Update)</option>
+              <option value="green">Green (Verification & Test)</option>
+              <option value="indigo">Indigo (Trigger / Event)</option>
+              <option value="cyan">Cyan (Script / Code)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="inp-node-status">Status Eksekusi</label>
+            <select id="inp-node-status">
+              <option value="idle">Idle / Ready</option>
+              <option value="running">Running...</option>
+              <option value="completed">Completed</option>
+              <option value="error">Error</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="inp-node-desc">Deskripsi</label>
+            <textarea id="inp-node-desc" rows="4" placeholder="Jelaskan fungsi alur langkah ini..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="inp-node-tags">Tags (dipisahkan koma)</label>
+            <input type="text" id="inp-node-tags" placeholder="Python, Selenium, Stockbit" />
+          </div>
+
+          <div class="inspector-actions">
+            <button type="button" class="btn btn-emerald" id="btn-run-single-node">
+              <span class="icon">▶</span> Test Step Ini
+            </button>
+            <button type="button" class="btn btn-ghost" id="btn-duplicate-node">
+              <span class="icon">📋</span> Duplikat
+            </button>
+            <button type="button" class="btn btn-danger" id="btn-delete-node">
+              <span class="icon">🗑️</span> Hapus Node
+            </button>
+          </div>
+        </form>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- ── SOP Runbook Modal ── -->
+  <div id="modal-overlay" class="modal-overlay">
+    <div class="modal modal-xl">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span>📖</span> Notudo Finance — SOP Runbook & Pipeline Docs
+        </div>
+        <button class="btn-icon" id="btn-close-modal">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="runbook-grid">
+
+          <div class="runbook-card">
+            <div class="runbook-step-num">Step 1</div>
+            <h3>🔐 Login Stockbit</h3>
+            <p><strong>File:</strong> <code>pipeline/login.ipynb</code></p>
+            <p>Inisialisasi Edge WebDriver dengan profil khusus. Login Google secara manual lalu tekan tombol <strong>Q</strong> di keyboard untuk menyimpan sesi profil.</p>
+          </div>
+
+          <div class="runbook-card">
+            <div class="runbook-step-num">Step 2</div>
+            <h3>📋 Scraping Daftar Emiten</h3>
+            <p><strong>File:</strong> <code>pipeline/scrap-list-perusahaan.ipynb</code></p>
+            <p>Loop 10 sektor × sub-sektor di Stockbit menggunakan virtual scroll (scrollIntoView). Menghasilkan <code>List-Perusahaan/Perusahaan.csv</code> (~826 emiten).</p>
+          </div>
+
+          <div class="runbook-card">
+            <div class="runbook-step-num">Step 3</div>
+            <h3>💹 Scraping Harga Saham</h3>
+            <p><strong>File:</strong> <code>pipeline/scrap-all-harga.ipynb</code></p>
+            <p>Download data OHLCV historis per-emiten dari Perusahaan.csv dan simpan ke folder <code>Dataset/[KODE].JK.csv</code> (775 file CSV).</p>
+          </div>
+
+          <div class="runbook-card">
+            <div class="runbook-step-num">Step 4</div>
+            <h3>📊 Scraping Broker Summary</h3>
+            <p><strong>File:</strong> <code>pipeline/scrap-broker-summary.ipynb</code></p>
+            <p>Scraping aktivitas akumulasi/distribusi broker di Stockbit. Menggunakan auto-pause koneksi & proteksi skip ticker yang sudah lengkap (4-8 jam).</p>
+          </div>
+
+          <div class="runbook-card">
+            <div class="runbook-step-num">Step 5</div>
+            <h3>🔄 Update Existing CSVs</h3>
+            <p><strong>File:</strong> <code>pipeline/update_existing_csvs.py</code></p>
+            <p>Insersi kolom <code>Sektor</code> & <code>Sub_Sektor</code> dari Perusahaan.csv ke seluruh file CSV di folder Dataset/ setelah kolom Volume.</p>
+          </div>
+
+          <div class="runbook-card">
+            <div class="runbook-step-num">Step 6</div>
+            <h3>🧪 Verifikasi Data</h3>
+            <p><strong>File:</strong> <code>pipeline/test-read.ipynb</code></p>
+            <p>Verifikasi integritas dataset CSV, validasi kelengkapan kolom, dan pastikan tidak ada data korup sebelum di-publish.</p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Toast Notification Container ── -->
+  <div id="toast-container"></div>
+
+  <!-- App Script -->
+  <script src="app.js"></script>
+</body>
+</html>

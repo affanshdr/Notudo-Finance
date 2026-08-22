@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Notudo Finance — Pipeline Flow</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0a0d1a;
+      color: #e2e8f0;
+      height: 100vh;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* ── Header ── */
+    #header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      height: 60px;
+      background: rgba(15,20,40,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(99,102,241,0.25);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 16px;
+    }
+    #header .logo { font-size: 18px; font-weight: 700; color: #818cf8; letter-spacing: -0.3px; }
+    #header .subtitle { font-size: 12px; color: #64748b; }
+    #header .badge {
+      margin-left: auto;
+      background: rgba(99,102,241,0.15);
+      border: 1px solid rgba(99,102,241,0.3);
+      color: #818cf8;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+    #hint {
+      font-size: 11px;
+      color: #475569;
+      margin-left: 8px;
+    }
+
+    /* ── Canvas ── */
+    #canvas {
+      position: fixed;
+      top: 60px; bottom: 0; left: 0; right: 0;
+      overflow: hidden;
+      cursor: grab;
+    }
+    #canvas.panning { cursor: grabbing; }
+
+    #world {
+      position: absolute;
+      width: 4000px;
+      height: 3000px;
+      transform-origin: 0 0;
+    }
+
+    /* ── SVG arrows ── */
+    #arrows-svg {
+      position: absolute;
+      top: 0; left: 0;
+      width: 4000px;
+      height: 3000px;
+      pointer-events: none;
+    }
+
+    /* ── Node ── */
+    .node {
+      position: absolute;
+      min-width: 220px;
+      border-radius: 16px;
+      padding: 18px 20px;
+      cursor: grab;
+      transition: box-shadow 0.2s, transform 0.15s;
+      border: 1px solid transparent;
+    }
+    .node:hover { transform: translateY(-2px); }
+    .node.dragging { cursor: grabbing; z-index: 50; transform: scale(1.03); }
+
+    /* colour themes */
+    .node.purple {
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+      border-color: rgba(129,140,248,0.4);
+      box-shadow: 0 4px 24px rgba(99,102,241,0.25);
+    }
+    .node.purple:hover { box-shadow: 0 8px 32px rgba(99,102,241,0.4); border-color: rgba(129,140,248,0.7); }
+
+    .node.teal {
+      background: linear-gradient(135deg, #0c2a2a 0%, #134e4a 100%);
+      border-color: rgba(20,184,166,0.4);
+      box-shadow: 0 4px 24px rgba(20,184,166,0.2);
+    }
+    .node.teal:hover { box-shadow: 0 8px 32px rgba(20,184,166,0.35); border-color: rgba(20,184,166,0.7); }
+
+    .node.amber {
+      background: linear-gradient(135deg, #1c1202 0%, #3d2800 100%);
+      border-color: rgba(251,191,36,0.4);
+      box-shadow: 0 4px 24px rgba(251,191,36,0.15);
+    }
+    .node.amber:hover { box-shadow: 0 8px 32px rgba(251,191,36,0.3); border-color: rgba(251,191,36,0.7); }
+
+    .node.rose {
+      background: linear-gradient(135deg, #1f0a0a 0%, #4c0519 100%);
+      border-color: rgba(244,63,94,0.4);
+      box-shadow: 0 4px 24px rgba(244,63,94,0.2);
+    }
+    .node.rose:hover { box-shadow: 0 8px 32px rgba(244,63,94,0.35); border-color: rgba(244,63,94,0.7); }
+
+    .node.sky {
+      background: linear-gradient(135deg, #06172a 0%, #0c2d48 100%);
+      border-color: rgba(56,189,248,0.4);
+      box-shadow: 0 4px 24px rgba(56,189,248,0.2);
+    }
+    .node.sky:hover { box-shadow: 0 8px 32px rgba(56,189,248,0.35); border-color: rgba(56,189,248,0.7); }
+
+    .node.green {
+      background: linear-gradient(135deg, #052010 0%, #14532d 100%);
+      border-color: rgba(34,197,94,0.4);
+      box-shadow: 0 4px 24px rgba(34,197,94,0.2);
+    }
+    .node.green:hover { box-shadow: 0 8px 32px rgba(34,197,94,0.35); border-color: rgba(34,197,94,0.7); }
+
+    /* node internals */
+    .node-icon { font-size: 28px; margin-bottom: 10px; }
+    .node-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #f1f5f9;
+      margin-bottom: 4px;
+    }
+    .node-file {
+      font-size: 11px;
+      font-weight: 500;
+      opacity: 0.55;
+      font-family: 'Courier New', monospace;
+      margin-bottom: 10px;
+    }
+    .node-desc {
+      font-size: 12px;
+      color: #94a3b8;
+      line-height: 1.55;
+    }
+    .node-tags {
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .tag {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.3px;
+    }
+    .tag.python  { background: rgba(99,102,241,0.2); color: #a5b4fc; }
+    .tag.selenium{ background: rgba(20,184,166,0.2); color: #5eead4; }
+    .tag.pandas  { background: rgba(56,189,248,0.2); color: #7dd3fc; }
+    .tag.csv     { background: rgba(34,197,94,0.2);  color: #86efac; }
+    .tag.stockbit{ background: rgba(251,191,36,0.2); color: #fde68a; }
+    .tag.edge    { background: rgba(244,63,94,0.2);  color: #fda4af; }
+
+    /* ── Data store box ── */
+    .datastore {
+      position: absolute;
+      border-radius: 12px;
+      border: 1px dashed rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.02);
+      padding: 14px 18px;
+      pointer-events: none;
+    }
+    .datastore-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      opacity: 0.35;
+      margin-bottom: 8px;
+    }
+    .datastore-item {
+      font-size: 11px;
+      color: #64748b;
+      font-family: monospace;
+      margin: 2px 0;
+    }
+
+    /* ── Tooltip ── */
+    #tooltip {
+      position: fixed;
+      background: rgba(15,23,42,0.95);
+      border: 1px solid rgba(99,102,241,0.3);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 12px;
+      color: #cbd5e1;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s;
+      max-width: 260px;
+      z-index: 200;
+    }
+    #tooltip.show { opacity: 1; }
+
+    /* ── Controls ── */
+    #controls {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 100;
+    }
+    .ctrl-btn {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      background: rgba(30,41,59,0.9);
+      border: 1px solid rgba(99,102,241,0.25);
+      color: #94a3b8;
+      font-size: 16px;
+      cursor: pointer;
+      display: grid; place-items: center;
+      transition: background 0.15s, color 0.15s;
+      backdrop-filter: blur(8px);
+    }
+    .ctrl-btn:hover { background: rgba(99,102,241,0.2); color: #e2e8f0; }
+
+    /* ── Legend ── */
+    #legend {
+      position: fixed;
+      bottom: 24px;
+      left: 24px;
+      background: rgba(15,20,40,0.88);
+      border: 1px solid rgba(99,102,241,0.2);
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 11px;
+      color: #64748b;
+      backdrop-filter: blur(10px);
+      z-index: 100;
+    }
+    #legend .leg-title { font-weight: 600; color: #94a3b8; margin-bottom: 8px; font-size: 12px; }
+    .leg-row { display: flex; align-items: center; gap: 8px; margin: 4px 0; }
+    .leg-dot { width: 10px; height: 10px; border-radius: 50%; }
+  </style>
+</head>
+<body>
+
+<div id="header">
+  <span class="logo">🇮🇩 Notudo Finance</span>
+  <span class="subtitle">BEI Scraping Pipeline</span>
+  <span id="hint">Drag nodes · Scroll/pinch to zoom · Drag canvas to pan</span>
+  <span class="badge">775 Emiten BEI</span>
+</div>
+
+<div id="canvas">
+  <div id="world">
+    <svg id="arrows-svg" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="rgba(129,140,248,0.6)"/>
+        </marker>
+        <marker id="arr-teal" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="rgba(20,184,166,0.7)"/>
+        </marker>
+        <marker id="arr-amber" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="rgba(251,191,36,0.7)"/>
+        </marker>
+        <marker id="arr-sky" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="rgba(56,189,248,0.7)"/>
+        </marker>
+      </defs>
+    </svg>
+
+    <!-- Data stores (background, non-draggable) -->
+    <div class="datastore" style="left:860px;top:290px;width:200px;">
+      <div class="datastore-label">📂 List-Perusahaan/</div>
+      <div class="datastore-item">Perusahaan.csv</div>
+      <div class="datastore-item" style="opacity:.5;font-size:10px">826 emiten · 5 kolom</div>
+    </div>
+
+    <div class="datastore" style="left:860px;top:650px;width:200px;">
+      <div class="datastore-label">📂 Dataset/</div>
+      <div class="datastore-item">AADI.JK.csv</div>
+      <div class="datastore-item">BBCA.JK.csv</div>
+      <div class="datastore-item" style="opacity:.5">... 775 file CSV</div>
+    </div>
+
+    <!-- ── NODES (will be positioned by JS) ── -->
+
+    <div class="node purple" id="node-login"
+      data-x="100" data-y="300"
+      data-tip="Buka browser Edge dengan profil Stockbit khusus. Tunggu sampai login manual selesai (keyboard.wait). Session tersimpan di profil browser jadi tidak perlu login ulang setiap run.">
+      <div class="node-icon">🔐</div>
+      <div class="node-label">Login Stockbit</div>
+      <div class="node-file">login.ipynb</div>
+      <div class="node-desc">Inisialisasi Edge WebDriver dengan profil khusus Stockbit. Tunggu login manual via keyboard.</div>
+      <div class="node-tags">
+        <span class="tag python">Python</span>
+        <span class="tag selenium">Selenium</span>
+        <span class="tag edge">Edge Driver</span>
+        <span class="tag stockbit">Stockbit</span>
+      </div>
+    </div>
+
+    <div class="node teal" id="node-listco"
+      data-x="100" data-y="580"
+      data-tip="Scraping daftar semua emiten BEI dari Stockbit per sektor & sub-sektor. Menggunakan virtual scroll trick: scrollIntoView pada elemen terakhir. Total 826 perusahaan dari 10 sektor.">
+      <div class="node-icon">📋</div>
+      <div class="node-label">Scraping Daftar Emiten</div>
+      <div class="node-file">scrap-list-perusahaan.ipynb</div>
+      <div class="node-desc">Loop 10 sektor &amp; sub-sektor di Stockbit. Virtual scroll untuk tabel panjang. Output: Perusahaan.csv</div>
+      <div class="node-tags">
+        <span class="tag selenium">Selenium</span>
+        <span class="tag pandas">Pandas</span>
+        <span class="tag stockbit">Stockbit</span>
+        <span class="tag csv">CSV Output</span>
+      </div>
+    </div>
+
+    <div class="node amber" id="node-harga"
+      data-x="100" data-y="870"
+      data-tip="Scraping harga historis untuk semua 775 emiten dari Yahoo Finance (via yfinance) atau sumber lain. Setiap emiten disimpan sebagai file CSV terpisah di folder Dataset/.">
+      <div class="node-icon">💹</div>
+      <div class="node-label">Scraping Harga Saham</div>
+      <div class="node-file">scrap-all-harga.ipynb</div>
+      <div class="node-desc">Download data OHLCV semua emiten. Simpan per-ticker ke Dataset/[KODE].JK.csv</div>
+      <div class="node-tags">
+        <span class="tag python">Python</span>
+        <span class="tag pandas">Pandas</span>
+        <span class="tag csv">775 CSVs</span>
+      </div>
+    </div>
+
+    <div class="node rose" id="node-broker"
+      data-x="100" data-y="1160"
+      data-tip="Scraping broker summary dari halaman /symbol/[KODE] di Stockbit. Navigasi mundur per hari, proteksi koneksi, validasi kode broker 2 huruf kapital. Data append ke CSV yang sudah ada.">
+      <div class="node-icon">📊</div>
+      <div class="node-label">Scraping Broker Summary</div>
+      <div class="node-file">scrap-broker-summary.ipynb</div>
+      <div class="node-desc">Loop 775 ticker. Navigasi tanggal mundur. Tambah kolom broker ke CSV. Validasi &amp; proteksi koneksi.</div>
+      <div class="node-tags">
+        <span class="tag selenium">Selenium</span>
+        <span class="tag pandas">Pandas</span>
+        <span class="tag stockbit">Stockbit</span>
+        <span class="tag csv">Append CSV</span>
+      </div>
+    </div>
+
+    <div class="node sky" id="node-update"
+      data-x="100" data-y="1450"
+      data-tip="Migrasi & update semua CSV di Dataset/. Menambahkan kolom Sektor & Sub_Sektor dari Perusahaan.csv. Sisipkan kolom setelah 'Volume'. Skip file yang sudah punya kolom tersebut.">
+      <div class="node-icon">🔄</div>
+      <div class="node-label">Update Existing CSVs</div>
+      <div class="node-file">update_existing_csvs.py</div>
+      <div class="node-desc">Tambah kolom Sektor &amp; Sub_Sektor ke semua CSV. Mapping dari Perusahaan.csv. Skip jika sudah ada.</div>
+      <div class="node-tags">
+        <span class="tag python">Python</span>
+        <span class="tag pandas">Pandas</span>
+        <span class="tag csv">Bulk Update</span>
+      </div>
+    </div>
+
+    <div class="node green" id="node-test"
+      data-x="100" data-y="1740"
+      data-tip="Notebook untuk membaca dan memverifikasi data hasil scraping. Cek struktur CSV, kelengkapan data, dan konsistensi format.">
+      <div class="node-icon">🧪</div>
+      <div class="node-label">Verifikasi Data</div>
+      <div class="node-file">test-read.ipynb</div>
+      <div class="node-desc">Baca &amp; validasi hasil CSV. Cek struktur, kelengkapan kolom, dan konsistensi data.</div>
+      <div class="node-tags">
+        <span class="tag python">Python</span>
+        <span class="tag pandas">Pandas</span>
+      </div>
+    </div>
+
+  </div><!-- #world -->
+</div><!-- #canvas -->
+
+<div id="tooltip"></div>
+
+<div id="controls">
+  <button class="ctrl-btn" id="btn-plus" title="Zoom In">+</button>
+  <button class="ctrl-btn" id="btn-minus" title="Zoom Out">−</button>
+  <button class="ctrl-btn" id="btn-fit" title="Fit View">⊡</button>
+</div>
+
+<div id="legend">
+  <div class="leg-title">Alur Pipeline</div>
+  <div class="leg-row"><div class="leg-dot" style="background:#818cf8"></div>Login / Setup</div>
+  <div class="leg-row"><div class="leg-dot" style="background:#14b8a6"></div>Scraping Daftar</div>
+  <div class="leg-row"><div class="leg-dot" style="background:#fbbf24"></div>Scraping Harga</div>
+  <div class="leg-row"><div class="leg-dot" style="background:#f43f5e"></div>Scraping Broker</div>
+  <div class="leg-row"><div class="leg-dot" style="background:#38bdf8"></div>Update & Migrasi</div>
+  <div class="leg-row"><div class="leg-dot" style="background:#22c55e"></div>Verifikasi</div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   NODE POSITIONING + DRAG
+═══════════════════════════════════════════════ */
+const nodes = document.querySelectorAll('.node');
+const world = document.getElementById('world');
+const canvas = document.getElementById('canvas');
+const svg = document.getElementById('arrows-svg');
+
+// initialise positions from data attributes
+nodes.forEach(n => {
+  n.style.left = n.dataset.x + 'px';
+  n.style.top  = n.dataset.y + 'px';
+});
+
+// Node drag
+let dragNode = null, dragOffX = 0, dragOffY = 0;
+
+nodes.forEach(node => {
+  node.addEventListener('mousedown', e => {
+    if (e.button !== 0) return;
+    e.stopPropagation();
+    dragNode = node;
+    const rect = node.getBoundingClientRect();
+    const scale = getScale();
+    dragOffX = (e.clientX - rect.left) / scale;
+    dragOffY = (e.clientY - rect.top)  / scale;
+    node.classList.add('dragging');
+  });
+
+  // Tooltip
+  node.addEventListener('mouseenter', e => {
+    const tip = document.getElementById('tooltip');
+    tip.textContent = node.dataset.tip;
+    tip.classList.add('show');
+    moveTip(e);
+  });
+  node.addEventListener('mousemove', moveTip);
+  node.addEventListener('mouseleave', () => {
+    document.getElementById('tooltip').classList.remove('show');
+  });
+});
+
+function moveTip(e) {
+  const tip = document.getElementById('tooltip');
+  tip.style.left = (e.clientX + 14) + 'px';
+  tip.style.top  = (e.clientY + 14) + 'px';
+}
+
+document.addEventListener('mousemove', e => {
+  if (dragNode) {
+    const scale = getScale();
+    const wx = (e.clientX - panX) / scale;
+    const wy = (e.clientY - 60 - panY) / scale;
+    dragNode.style.left = (wx - dragOffX) + 'px';
+    dragNode.style.top  = (wy - dragOffY) + 'px';
+    drawArrows();
+  } else if (panning) {
+    panX += e.clientX - lastPanX;
+    panY += e.clientY - lastPanY;
+    lastPanX = e.clientX;
+    lastPanY = e.clientY;
+    applyTransform();
+  }
+});
+document.addEventListener('mouseup', () => {
+  if (dragNode) {
+    dragNode.classList.remove('dragging');
+    dragNode = null;
+    drawArrows();
+  }
+  panning = false;
+  canvas.classList.remove('panning');
+});
+
+/* ═══════════════════════════════════════════════
+   CANVAS PAN
+═══════════════════════════════════════════════ */
+let panX = 40, panY = 0, panning = false, lastPanX = 0, lastPanY = 0;
+
+canvas.addEventListener('mousedown', e => {
+  if (e.button !== 0 || dragNode) return;
+  panning = true;
+  lastPanX = e.clientX;
+  lastPanY = e.clientY;
+  canvas.classList.add('panning');
+});
+
+/* ═══════════════════════════════════════════════
+   ZOOM
+═══════════════════════════════════════════════ */
+let zoom = 0.72;
+function getScale() { return zoom; }
+
+function applyTransform() {
+  world.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
+}
+applyTransform();
+
+canvas.addEventListener('wheel', e => {
+  e.preventDefault();
+  const delta = e.deltaY < 0 ? 0.08 : -0.08;
+  const newZoom = Math.min(2, Math.max(0.2, zoom + delta));
+  // zoom around mouse pointer
+  const mx = e.clientX, my = e.clientY - 60;
+  panX = mx - (mx - panX) * (newZoom / zoom);
+  panY = my - (my - panY) * (newZoom / zoom);
+  zoom = newZoom;
+  applyTransform();
+  drawArrows();
+}, { passive: false });
+
+document.getElementById('btn-plus').onclick  = () => { zoom = Math.min(2, zoom + 0.1); applyTransform(); drawArrows(); };
+document.getElementById('btn-minus').onclick = () => { zoom = Math.max(0.2, zoom - 0.1); applyTransform(); drawArrows(); };
+document.getElementById('btn-fit').onclick   = () => { zoom = 0.72; panX = 40; panY = 0; applyTransform(); drawArrows(); };
+
+/* ═══════════════════════════════════════════════
+   ARROWS
+═══════════════════════════════════════════════ */
+// pairs of [fromId, toId, markerType, color]
+const connections = [
+  ['node-login',  'node-listco', 'arr',       'rgba(129,140,248,0.55)'],
+  ['node-listco', 'node-harga',  'arr-teal',  'rgba(20,184,166,0.6)'],
+  ['node-harga',  'node-broker', 'arr-amber', 'rgba(251,191,36,0.6)'],
+  ['node-broker', 'node-update', 'arr',       'rgba(244,63,94,0.6)'],
+  ['node-update', 'node-test',   'arr-sky',   'rgba(56,189,248,0.6)'],
+];
+
+function nodeCenter(id) {
+  const n = document.getElementById(id);
+  const x = parseFloat(n.style.left);
+  const y = parseFloat(n.style.top);
+  const w = n.offsetWidth;
+  const h = n.offsetHeight;
+  return { x: x + w / 2, y: y + h / 2, bottom: y + h, top: y, cx: x + w / 2 };
+}
+
+function drawArrows() {
+  // remove old paths
+  svg.querySelectorAll('path.arrow-line').forEach(p => p.remove());
+
+  connections.forEach(([from, to, marker, color]) => {
+    const a = nodeCenter(from);
+    const b = nodeCenter(to);
+
+    // exit bottom of source, enter top of dest (vertical flow)
+    const x1 = a.cx, y1 = a.bottom + 4;
+    const x2 = b.cx, y2 = b.top   - 4;
+    const cy1 = y1 + (y2 - y1) * 0.45;
+    const cy2 = y1 + (y2 - y1) * 0.55;
+
+    const d = `M ${x1} ${y1} C ${x1} ${cy1}, ${x2} ${cy2}, ${x2} ${y2}`;
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('class', 'arrow-line');
+    path.setAttribute('d', d);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', color);
+    path.setAttribute('stroke-width', '2.5');
+    path.setAttribute('stroke-dasharray', '0');
+    path.setAttribute('marker-end', `url(#${marker})`);
+    svg.appendChild(path);
+  });
+}
+
+// Touch support for mobile/tablet pan
+let touchStartX = 0, touchStartY = 0;
+canvas.addEventListener('touchstart', e => {
+  touchStartX = e.touches[0].clientX - panX;
+  touchStartY = e.touches[0].clientY - panY;
+}, { passive: true });
+canvas.addEventListener('touchmove', e => {
+  panX = e.touches[0].clientX - touchStartX;
+  panY = e.touches[0].clientY - touchStartY;
+  applyTransform(); drawArrows();
+}, { passive: true });
+
+// Initial draw
+drawArrows();
+</script>
+</body>
+</html>
