@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  fullName  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Emiten {
+  ticker        String          @id
+  name          String?
+  sektor        String?
+  subSektor     String?
+  createdAt     DateTime        @default(now())
+  brokerSummaries BrokerSummary[]
+}
+
+model BrokerSummary {
+  id         BigInt   @id @default(autoincrement())
+  ticker     String
+  date       DateTime @db.Date
+  brokerCode String
+  buyVolume  BigInt   @default(0)
+  sellVolume BigInt   @default(0)
+  createdAt  DateTime @default(now())
+
+  emiten Emiten @relation(fields: [ticker], references: [ticker], onDelete: Cascade)
+
+  @@index([ticker, date])
+  @@index([brokerCode])
+}
