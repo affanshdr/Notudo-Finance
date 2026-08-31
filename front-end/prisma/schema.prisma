@@ -8,20 +8,74 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  fullName  String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+// =============================================
+// Better Auth Tables
+// =============================================
+
+model user {
+  id            String    @id
+  name          String
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  sessions      session[]
+  accounts      account[]
 }
 
+model session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+
+  user      user     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  issuer                String?
+  accessToken           String?   @db.Text
+  refreshToken          String?   @db.Text
+  idToken               String?   @db.Text
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?   @db.Text
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  user                  user      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
+
+// =============================================
+// App Tables
+// =============================================
+
 model Emiten {
-  ticker        String          @id
-  name          String?
-  sektor        String?
-  subSektor     String?
-  createdAt     DateTime        @default(now())
+  ticker          String          @id
+  name            String?
+  sektor          String?
+  subSektor       String?
+  createdAt       DateTime        @default(now())
   brokerSummaries BrokerSummary[]
 }
 

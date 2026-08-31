@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase-server";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 export async function POST(request: Request) {
-  const supabase = await createClient();
-  await supabase.auth.signOut();
+  await auth.api.signOut({
+    headers: await headers(),
+  });
 
   const { origin } = new URL(request.url);
   return NextResponse.redirect(`${origin}/login`);

@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import styles from "./login.module.css";
-import { createClient } from "@/lib/supabase";
+import { authClient } from "@/lib/auth-client";
 
 function LoginForm() {
   const router = useRouter();
@@ -41,16 +41,18 @@ function LoginForm() {
     setIsLoading(true);
 
     try {
-      const supabase = createClient();
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await authClient.signIn.email({
+        email,
+        password,
+      });
 
       if (error) {
         let errorMsg = "Login gagal. Periksa email dan kata sandi Anda.";
-        if (error.message.includes("Invalid login credentials")) {
+        if (error.message?.includes("Invalid") || error.message?.includes("credentials")) {
           errorMsg = "Email atau kata sandi salah. Silakan coba lagi.";
-        } else if (error.message.includes("Email not confirmed")) {
-          errorMsg = "Email belum diverifikasi. Silakan cek inbox/spam Anda dan klik link aktivasi.";
-        } else if (error.message.includes("Too many requests")) {
+        } else if (error.message?.includes("verified") || error.message?.includes("EMAIL_NOT_VERIFIED")) {
+          errorMsg = "Email belum diverifikasi. Silakan cek inbox/spam dan masukkan kode OTP.";
+        } else if (error.message?.includes("Too many") || error.message?.includes("rate")) {
           errorMsg = "Terlalu banyak percobaan login. Silakan tunggu beberapa menit.";
         }
         setStatusMsg({ type: "error", text: errorMsg });

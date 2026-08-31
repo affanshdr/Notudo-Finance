@@ -1,0 +1,681 @@
+/* =============================================
+   Dashboard Layout & Sidebar
+   ============================================= */
+
+.dashboardRoot {
+  display: flex;
+  min-height: 100vh;
+  background: #060b14;
+  font-family: 'Inter', 'Outfit', sans-serif;
+  color: #f1f5f9;
+}
+
+/* ─── Sidebar ─── */
+.sidebar {
+  width: 260px;
+  min-height: 100vh;
+  background: rgba(11, 15, 25, 0.95);
+  border-right: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+}
+
+.sidebarLogo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 20px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  text-decoration: none;
+}
+
+.sidebarLogoIcon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.sidebarLogoText {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  letter-spacing: -0.02em;
+}
+
+.sidebarUser {
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sidebarAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0284c7, #7c3aed);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.sidebarUserName {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #f1f5f9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebarUserEmail {
+  font-size: 0.72rem;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebarNav {
+  flex: 1;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sidebarLabel {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #475569;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 8px 8px 4px;
+  margin-top: 8px;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-decoration: none;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+
+.navItem:hover {
+  background: rgba(255,255,255,0.06);
+  color: #f1f5f9;
+}
+
+.navItemActive {
+  background: rgba(2, 132, 199, 0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.15);
+}
+
+.navItemActive:hover {
+  background: rgba(2, 132, 199, 0.2);
+  color: #38bdf8;
+}
+
+.navIcon {
+  font-size: 1rem;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.navBadge {
+  margin-left: auto;
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 999px;
+}
+
+.sidebarFooter {
+  padding: 12px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.logoutBtn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #f87171;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+}
+
+.logoutBtn:hover {
+  background: rgba(248, 113, 113, 0.1);
+}
+
+/* ─── Main Content ─── */
+.mainContent {
+  margin-left: 260px;
+  flex: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Top Header ─── */
+.topHeader {
+  padding: 20px 32px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(6, 11, 20, 0.8);
+  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.headerLeft h1 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.headerLeft p {
+  font-size: 0.78rem;
+  color: #64748b;
+  margin: 2px 0 0;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.liveBadge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(52, 211, 153, 0.1);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  color: #34d399;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 999px;
+  letter-spacing: 0.04em;
+}
+
+.liveDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #34d399;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ─── Page Body ─── */
+.pageBody {
+  padding: 28px 32px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* ─── Stats Bar ─── */
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.statCard {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: border-color 0.2s;
+}
+
+.statCard:hover {
+  border-color: rgba(56, 189, 248, 0.2);
+}
+
+.statCardLabel {
+  font-size: 0.72rem;
+  color: #64748b;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.statCardValue {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #f1f5f9;
+  line-height: 1.1;
+}
+
+.statCardSub {
+  font-size: 0.72rem;
+  color: #475569;
+}
+
+.statCardValue.green { color: #34d399; }
+.statCardValue.red { color: #f87171; }
+.statCardValue.blue { color: #38bdf8; }
+
+/* ─── Section ─── */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sectionTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.sectionMeta {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin: 2px 0 0;
+}
+
+/* ─── Top Movers ─── */
+.topMoversGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+}
+
+.moverCard {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 16px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.moverCard:hover {
+  transform: translateY(-2px);
+  border-color: rgba(56, 189, 248, 0.25);
+  background: rgba(56, 189, 248, 0.04);
+}
+
+.moverCard.buyCard:hover { border-color: rgba(52, 211, 153, 0.3); }
+.moverCard.sellCard:hover { border-color: rgba(248, 113, 113, 0.3); }
+
+.moverTicker {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #f1f5f9;
+  letter-spacing: 0.03em;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+.moverName {
+  font-size: 0.68rem;
+  color: #64748b;
+  margin: 3px 0 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.moverNet {
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.moverNet.pos { color: #34d399; }
+.moverNet.neg { color: #f87171; }
+
+.moverLabel {
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-top: 6px;
+}
+
+.moverLabel.buy {
+  background: rgba(52, 211, 153, 0.1);
+  color: #34d399;
+}
+
+.moverLabel.sell {
+  background: rgba(248, 113, 113, 0.1);
+  color: #f87171;
+}
+
+/* ─── Broker Tracker Panel ─── */
+.trackerPanel {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.trackerToolbar {
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.searchWrap {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+  max-width: 340px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.85rem;
+  color: #475569;
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  padding: 8px 12px 8px 34px;
+  font-size: 0.83rem;
+  color: #f1f5f9;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.searchInput::placeholder { color: #475569; }
+.searchInput:focus { border-color: rgba(56, 189, 248, 0.4); }
+
+.filterSelect {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.83rem;
+  color: #f1f5f9;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.filterSelect:focus { border-color: rgba(56, 189, 248, 0.4); }
+
+.trackerCount {
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: #475569;
+  white-space: nowrap;
+}
+
+/* ─── Broker Table ─── */
+.tableWrap {
+  overflow-x: auto;
+}
+
+.brokerTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.brokerTable thead th {
+  padding: 10px 16px;
+  text-align: left;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #475569;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: rgba(255,255,255,0.02);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  white-space: nowrap;
+}
+
+.brokerTable thead th:nth-child(3),
+.brokerTable thead th:nth-child(4),
+.brokerTable thead th:nth-child(5),
+.brokerTable thead th:nth-child(6) {
+  text-align: right;
+}
+
+.brokerTable tbody tr {
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  transition: background 0.15s;
+}
+
+.brokerTable tbody tr:hover {
+  background: rgba(255,255,255,0.03);
+}
+
+.brokerTable tbody tr:last-child {
+  border-bottom: none;
+}
+
+.brokerTable td {
+  padding: 11px 16px;
+  vertical-align: middle;
+}
+
+.tickerCell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tickerCode {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #38bdf8;
+  letter-spacing: 0.05em;
+}
+
+.tickerName {
+  font-size: 0.7rem;
+  color: #64748b;
+}
+
+.brokerCode {
+  display: inline-block;
+  background: rgba(255,255,255,0.06);
+  color: #94a3b8;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+}
+
+.numCell {
+  text-align: right;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.numBuy { color: #34d399; }
+.numSell { color: #f87171; }
+.numNetPos { color: #34d399; font-weight: 700; }
+.numNetNeg { color: #f87171; font-weight: 700; }
+
+.barCell {
+  width: 100px;
+}
+
+.barWrap {
+  background: rgba(255,255,255,0.05);
+  border-radius: 4px;
+  height: 6px;
+  overflow: hidden;
+}
+
+.barFill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.barFillBuy { background: linear-gradient(90deg, #34d399, #059669); }
+.barFillSell { background: linear-gradient(90deg, #f87171, #dc2626); }
+
+.dateCell {
+  font-size: 0.72rem;
+  color: #475569;
+  white-space: nowrap;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 60px 20px;
+  color: #475569;
+}
+
+.emptyState p {
+  margin: 8px 0 0;
+  font-size: 0.83rem;
+}
+
+/* ─── Chart Section ─── */
+.chartGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.chartCard {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.chartCardTitle {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #f1f5f9;
+  margin: 0 0 16px;
+}
+
+.chartBar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chartBarRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.chartBarLabel {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #94a3b8;
+  width: 32px;
+  flex-shrink: 0;
+}
+
+.chartBarTrack {
+  flex: 1;
+  height: 8px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.chartBarFill {
+  height: 100%;
+  border-radius: 4px;
+}
+
+.chartBarValue {
+  font-size: 0.72rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: #94a3b8;
+  width: 50px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 1200px) {
+  .topMoversGrid { grid-template-columns: repeat(3, 1fr); }
+  .statsRow { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 900px) {
+  .sidebar { width: 60px; }
+  .sidebarLogoText, .sidebarUser, .navItem span:not(.navIcon), .navBadge, .sidebarLabel { display: none; }
+  .mainContent { margin-left: 60px; }
+  .chartGrid { grid-template-columns: 1fr; }
+}

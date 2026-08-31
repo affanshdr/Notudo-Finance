@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
   title: "Notudo Finance — Analisis Data Saham BEI Indonesia",
@@ -19,8 +23,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id">
-      <body>{children}</body>
+    <html lang="id" className={`${inter.variable} ${jetbrainsMono.variable}`}>
+      <body style={{ fontFamily: "var(--font-inter, Inter, sans-serif)" }}>{children}</body>
     </html>
   );
 }
